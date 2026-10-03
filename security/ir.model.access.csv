@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_booking_plan_user,booking.plan.user,model_booking_plan,base.group_user,1,0,0,0
+access_booking_plan_manager,booking.plan.manager,model_booking_plan,sales_team.group_sale_manager,1,1,1,1
+access_booking_time_slot_user,booking.time.slot.user,model_booking_time_slot,base.group_user,1,0,0,0
+access_booking_time_slot_manager,booking.time.slot.manager,model_booking_time_slot,sales_team.group_sale_manager,1,1,1,1
+access_booking_closing_period_user,booking.closing.period.user,model_booking_closing_period,base.group_user,1,0,0,0
+access_booking_closing_period_manager,booking.closing.period.manager,model_booking_closing_period,sales_team.group_sale_manager,1,1,1,1
+access_booking_day_slot_user,booking.day.slot.user,model_booking_day_slot,base.group_user,1,0,0,0
+access_booking_day_slot_manager,booking.day.slot.manager,model_booking_day_slot,sales_team.group_sale_manager,1,1,1,1
+access_booking_product_plan_user,booking.product.plan.user,model_booking_product_plan,base.group_user,1,0,0,0
+access_booking_product_plan_manager,booking.product.plan.manager,model_booking_product_plan,sales_team.group_sale_manager,1,1,1,1
+access_booking_order_user,booking.order.user,model_booking_order,base.group_user,1,0,0,0
+access_booking_order_salesman,booking.order.salesman,model_booking_order,sales_team.group_sale_salesman,1,1,0,0
+access_booking_order_manager,booking.order.manager,model_booking_order,sales_team.group_sale_manager,1,1,1,1

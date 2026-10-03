@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="booking_plan_view_list" model="ir.ui.view">
+        <field name="name">booking.plan.list</field>
+        <field name="model">booking.plan</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="booking_plan_view_form" model="ir.ui.view">
+        <field name="name">booking.plan.form</field>
+        <field name="model">booking.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
+                    <field name="active" invisible="True"/>
+                    <group>
+                        <group name="main">
+                            <field name="name" placeholder="e.g. Gold"/>
+                        </group>
+                        <group name="extra">
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Shown to the customer with the plan"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="booking_plan_view_search" model="ir.ui.view">
+        <field name="name">booking.plan.search</field>
+        <field name="model">booking.plan</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="booking_plan_action" model="ir.actions.act_window">
+        <field name="name">Booking Plans</field>
+        <field name="res_model">booking.plan</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first plan</p>
+            <p>Plans (Silver, Gold, Platinum...) are shared by all products. The price of each plan is set on the product.</p>
+        </field>
+    </record>
+</odoo>

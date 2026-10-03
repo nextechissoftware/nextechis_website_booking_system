@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="booking_time_slot_view_list" model="ir.ui.view">
+        <field name="name">booking.time.slot.list</field>
+        <field name="model">booking.time.slot</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="start_time" widget="float_time"/>
+                <field name="end_time" widget="float_time"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="booking_time_slot_view_search" model="ir.ui.view">
+        <field name="name">booking.time.slot.search</field>
+        <field name="model">booking.time.slot</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="booking_time_slot_action" model="ir.actions.act_window">
+        <field name="name">Booking Time Slots</field>
+        <field name="res_model">booking.time.slot</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first time slot</p>
+            <p>Time slots (09:00 - 11:00, 12:00 - 14:00...) are shared by all products. Each product chooses the days it is open.</p>
+        </field>
+    </record>
+</odoo>

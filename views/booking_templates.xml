@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- /booking : list of bookable products -->
+    <template id="booking_page" name="Bookable Products">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure oe_empty">
+                <section class="container py-5">
+                    <h1 class="mb-4">Book Now</h1>
+                    <div t-if="error" class="alert alert-danger" role="alert"><t t-out="error"/></div>
+                    <p t-if="not products" class="text-muted">Nothing is available for booking right now.</p>
+                    <div class="row g-4">
+                        <t t-foreach="products" t-as="product">
+                            <t t-set="prices" t-value="product._get_booking_prices()"/>
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <a t-att-href="product.website_url" class="card h-100 shadow-sm text-decoration-none text-reset">
+                                    <span t-field="product.image_512" t-options='{"widget": "image", "class": "card-img-top"}'/>
+                                    <div class="card-body">
+                                        <h4 class="card-title" t-out="product.name"/>
+                                        <div class="text-muted" t-if="prices">
+                                            From
+                                            <span t-out="min(prices)"
+                                                  t-options='{"widget": "monetary", "display_currency": product.currency_id}'/>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </t>
+                    </div>
+                </section>
+            </div>
+        </t>
+    </template>
+
+    <!-- Product page : Book Now button + booking popup -->
+    <template id="product_booking_wizard" inherit_id="website_sale.product" name="Booking Wizard">
+        <xpath expr="//div[@id='product_details']" position="inside">
+            <t t-if="product.is_booking_product">
+                <t t-set="booking_product" t-value="product.sudo()"/>
+                <t t-set="booking_ready" t-value="booking_product._is_booking_available()"/>
+                <t t-set="booking_days" t-value="booking_product._get_booking_calendar() if booking_ready else []"/>
+                <style>#add_to_cart_wrap, #buy_now_wrap, #buy_now, #product_details .css_quantity { display: none !important; }</style>
+                <div t-if="request.params.get('error')" class="alert alert-danger mt-3" role="alert">
+                    <t t-out="request.params.get('error')"/>
+                </div>
+                <div class="mt-3">
+                    <button t-if="booking_ready" type="button" class="btn btn-primary btn-lg"
+                            data-bs-toggle="modal" data-bs-target="#o_booking_modal">Book Now</button>
+                    <span t-else="" class="badge text-bg-secondary fs-6">No slot available</span>
+                </div>
+
+                <div t-if="booking_ready" class="modal fade o_booking_modal" id="o_booking_modal"
+                     tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <form action="/booking/add" method="post"
+                                  t-att-data-product="product.id"
+                                  t-att-data-currency="product.currency_id.name"
+                                  class="d-flex flex-column overflow-hidden">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="product_tmpl_id" t-att-value="product.id"/>
+                                <input type="hidden" name="date" value=""/>
+                                <input type="hidden" name="slot_id" value=""/>
+                                <input type="hidden" name="plan_id" value=""/>
+                                <input type="hidden" name="qty" value="1"/>
+
+                                <div class="o_bk_header">
+                                    <div>
+                                        <div class="o_bk_eyebrow">Reserve your spot</div>
+                                        <h5 class="o_bk_title mb-0" t-out="product.name"/>
+                                    </div>
+                                    <button type="button" class="btn-close btn-close-white"
+                                            data-bs-dismiss="modal" aria-label="Close"/>
+                                </div>
+
+                                <div class="modal-body o_bk_body">
+                                    <div class="o_bk_step">
+                                        <div class="o_bk_step_title">
+                                            <span class="o_bk_num">1</span>Pick a date
+                                            <button type="button" class="o_bk_cal_toggle ms-auto">
+                                                <i class="fa fa-calendar me-1"/>Calendar
+                                            </button>
+                                        </div>
+                                        <div class="o_bk_dates_wrap">
+                                            <button type="button" class="o_bk_arrow o_bk_prev" aria-label="Previous dates">&#8249;</button>
+                                            <div class="o_bk_dates">
+                                                <t t-foreach="booking_days" t-as="bday">
+                                                    <button type="button"
+                                                            t-attf-class="o_bk_date #{'' if bday['enabled'] else 'o_bk_date_off'}"
+                                                            t-att-data-date="bday['date']"
+                                                            t-att-disabled="None if bday['enabled'] else 'disabled'">
+                                                        <span class="o_bk_date_wd" t-out="bday['weekday']"/>
+                                                        <span class="o_bk_date_d" t-out="bday['day']"/>
+                                                        <span class="o_bk_date_m" t-out="bday['month']"/>
+                                                        <span t-if="not bday['enabled']" class="o_bk_date_closed">Closed</span>
+                                                    </button>
+                                                </t>
+                                            </div>
+                                            <button type="button" class="o_bk_arrow o_bk_next" aria-label="Next dates">&#8250;</button>
+                                        </div>
+                                        <div class="o_bk_cal d-none"/>
+                                    </div>
+
+                                    <div class="o_bk_step">
+                                        <div class="o_bk_step_title"><span class="o_bk_num">2</span>Choose a time</div>
+                                        <div class="o_bk_slots"/>
+                                    </div>
+
+                                    <div class="o_bk_step">
+                                        <div class="o_bk_step_title"><span class="o_bk_num">3</span>Choose a plan</div>
+                                        <div class="o_bk_plans"/>
+                                    </div>
+
+                                    <div class="o_bk_step">
+                                        <div class="o_bk_step_title"><span class="o_bk_num">4</span>Guests</div>
+                                        <div class="d-flex align-items-center gap-3 flex-wrap">
+                                            <div class="o_bk_stepper">
+                                                <button type="button" class="o_bk_minus" aria-label="Fewer">&#8722;</button>
+                                                <span class="o_bk_qty_value">1</span>
+                                                <button type="button" class="o_bk_plus" aria-label="More">+</button>
+                                            </div>
+                                            <small class="text-muted o_bk_hint"/>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="o_bk_footer">
+                                    <div>
+                                        <div class="o_bk_total_label">Total</div>
+                                        <div class="o_bk_total">-</div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-lg o_bk_submit" disabled="disabled">Add to Cart</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>
